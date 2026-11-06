@@ -30,7 +30,7 @@ class KeyVault(context: Context) {
 
     @Volatile private var dataKey: ByteArray? = null
 
-    val isSetUp: Boolean get() = prefs.contains(K_MASTER_BLOB)
+    val isSetUp: Boolean get() = prefs.contains(K_PIN_BLOB)
     val isUnlocked: Boolean get() = dataKey != null
     val isBiometricEnabled: Boolean get() = prefs.contains(K_BIO_BLOB)
 
@@ -44,22 +44,32 @@ class KeyVault(context: Context) {
 
     // ---------- Pehli baar setup ----------
 
-    /** Recovery Key ka text wapas karta hai. Usay sirf ek baar dikhana hai. */
-    fun setup(master: CharArray, pin: CharArray): String {
+    /**
+     * Pehli baar setup. Recovery Key ke bytes pehle bana kar user ko dikhaye ja chuke hote hain,
+     * aur user ki tasdeeq ke baad hi ye call hota hai, taake adhura setup kabhi na bache.
+     */
+    fun setup(master: CharArray, pin: CharArray, recoveryBytes: ByteArray) {
         require(isMasterPasswordAcceptable(master)) { "Master Password kamzor hai" }
         require(isPinFormatOk(pin)) { "PIN 4 se 6 hindsay ka ho" }
+        require(recoveryBytes.size == 32) { "Recovery Key ghalat size ki hai" }
         val dk = Crypto.randomBytes(32)
-        val recoveryBytes = Crypto.randomBytes(32)
+        wrapWithMaster(dk, master)
+        prefs.edit()
+            .putString(K_RECOVERY_BLOB, b64(Crypto.encrypt(recoveryKek(recoveryBytes), dk)))
+            .commit()
+        storePin(dk, pin)   // aakhir mein: isSetUp isi par depend karta hai
+        dataKey = dk
+    }
+
+    /** Naya Recovery Key (purana kaam karna band kar deta hai). Vault unlocked hona zaroori hai. */
+    fun regenerateRecoveryKey(): String {
+        val dk = requireKey()
+        val bytes = Crypto.randomBytes(32)
         try {
-            wrapWithMaster(dk, master)
-            prefs.edit()
-                .putString(K_RECOVERY_BLOB, b64(Crypto.encrypt(recoveryKek(recoveryBytes), dk)))
-                .commit()
-            storePin(dk, pin)
-            dataKey = dk
-            return RecoveryCode.encode(recoveryBytes)
+            prefs.edit().putString(K_RECOVERY_BLOB, b64(Crypto.encrypt(recoveryKek(bytes), dk))).commit()
+            return RecoveryCode.encode(bytes)
         } finally {
-            Crypto.wipe(recoveryBytes)
+            Crypto.wipe(bytes)
         }
     }
 
