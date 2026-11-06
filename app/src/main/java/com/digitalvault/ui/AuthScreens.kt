@@ -37,6 +37,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.Icon
+import androidx.compose.ui.platform.LocalContext
+import com.digitalvault.security.ClipboardHelper
 import com.digitalvault.security.Biometric
 import com.digitalvault.security.KeyVault
 import com.digitalvault.security.PasswordStrength
@@ -147,6 +153,23 @@ private fun SetupRecovery(vm: AuthViewModel) {
         vm.recoveryDisplay.split("-").chunked(4).forEach { row ->
             Text(row.joinToString("  "), fontFamily = FontFamily.Monospace, fontSize = 16.sp)
         }
+    }
+    val ctx = LocalContext.current
+    var copied by remember { mutableStateOf(false) }
+    Spacer(Modifier.height(10.dp))
+    OutlinedButton(
+        onClick = { ClipboardHelper.copy(ctx, vm.recoveryDisplay); copied = true },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(S.copyRecovery)
+    }
+    if (copied) {
+        Text(
+            S.recoveryCopied, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp)
+        )
     }
     Spacer(Modifier.height(12.dp))
     Row(
