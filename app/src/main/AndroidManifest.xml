@@ -4,8 +4,10 @@
     <!-- Marhala 1: INTERNET permission jaan-boojh kar nahi di gayi.
          Fingerprint ke liye USE_BIOMETRIC kaafi hai. -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
+        android:name=".DigitalVaultApp"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:label="Digital Vault"
