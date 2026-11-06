@@ -1,1 +1,18 @@
-
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Padlock ki kundi (shackle) -->
+    <path
+        android:strokeColor="#4C8DFF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M40,50 L40,42 A14,14 0 0 1 68,42 L68,50" />
+    <!-- Padlock ka jism, keyhole kata hua (evenOdd) -->
+    <path
+        android:fillColor="#4C8DFF"
+        android:fillType="evenOdd"
+        android:pathData="M34,50 H74 A4,4 0 0 1 78,54 V76 A4,4 0 0 1 74,80 H34 A4,4 0 0 1 30,76 V54 A4,4 0 0 1 34,50 Z M50,62 A4,4 0 1 0 58,62 A4,4 0 1 0 50,62 Z M52.5,66 H55.5 V74 H52.5 Z" />
+</vector>
