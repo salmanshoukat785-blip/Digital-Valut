@@ -113,6 +113,13 @@ class KeyVault(context: Context) {
         }
     }
 
+    /** Sirf check: Master Password theek hai ya nahi. Koi state nahi badalta. */
+    fun verifyMaster(master: CharArray): Boolean {
+        val dk = unwrapMaster(master) ?: return false
+        Crypto.wipe(dk)
+        return true
+    }
+
     // ---------- Tabdeeli ----------
 
     fun changeMasterPassword(old: CharArray, new: CharArray): Boolean {
