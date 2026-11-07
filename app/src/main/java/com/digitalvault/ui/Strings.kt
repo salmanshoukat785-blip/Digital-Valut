@@ -107,4 +107,29 @@ object S {
     const val confirmDeleteBody = "This can't be undone."
     const val close = "Close"
     fun comingSoon(part: Int) = "Coming in Part $part"
+
+    // ---- Part 5 ----
+    const val genTitle = "Password generator"
+    const val genLength = "Length"
+    const val genUpper = "Capital letters (A-Z)"
+    const val genLower = "Small letters (a-z)"
+    const val genDigits = "Numbers (0-9)"
+    const val genSymbols = "Special characters (!@#...)"
+    const val regenerate = "Generate new"
+    const val useForAccount = "Save as new password"
+
+    const val notesTitle = "Secure Notes"
+    const val noteTitleLabel = "Title"
+    const val noteBodyLabel = "Secret note"
+    const val untitled = "Untitled note"
+    const val noNotes = "No secure notes yet. Tap + to add one."
+    const val addNote = "New note"
+    const val editNote = "Edit note"
+    const val confirmDeleteNoteTitle = "Delete this note?"
+
+    const val appearance = "Appearance"
+    const val themeDark = "Dark"
+    const val themeLight = "Light"
+    const val themeSystem = "System"
+    const val moreSettings = "PIN, backup, auto-lock and language settings arrive in Part 7."
 }
