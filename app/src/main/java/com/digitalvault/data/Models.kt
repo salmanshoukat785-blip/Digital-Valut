@@ -30,3 +30,12 @@ data class PasswordHealth(
     val expired: List<Long>,
     val expiringSoon: List<Long>   // agle 7 din
 )
+
+/** Poore vault ki decrypt shuda copy (backup aur import ke liye). */
+data class VaultSnapshot(
+    val categories: List<CategoryEntity>,
+    val accounts: List<Account>,
+    val notes: List<SecureNote>
+)
+
+data class ImportResult(val accountsAdded: Int, val accountsSkipped: Int, val notesAdded: Int)

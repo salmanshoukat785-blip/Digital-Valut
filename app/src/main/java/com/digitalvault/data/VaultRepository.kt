@@ -125,6 +125,84 @@ class VaultRepository(private val vault: KeyVault, db: VaultDatabase) {
 
     suspend fun deleteNote(id: Long) = noteDao.delete(id)
 
+    // ---------------- Backup / import ----------------
+
+    suspend fun categoryList(): List<CategoryEntity> = categoryDao.getAll()
+
+    suspend fun snapshot(): VaultSnapshot {
+        val key = vault.requireKey()
+        return VaultSnapshot(
+            categories = categoryDao.getAll(),
+            accounts = accountDao.getAll().mapNotNull { runCatching { toAccount(it, key) }.getOrNull() },
+            notes = noteDao.getAll().mapNotNull { runCatching { toNote(it, key) }.getOrNull() }
+        )
+    }
+
+    /** Merge: jo cheez pehle se maujood ho (same naam, username, email, password) wo chhor di jati hai. */
+    suspend fun importSnapshot(s: VaultSnapshot): ImportResult {
+        val key = vault.requireKey()
+        val now = System.currentTimeMillis()
+        seedDefaultCategories()
+        val cats = categoryDao.getAll().toMutableList()
+        val idMap = HashMap<Long, Long>()
+        for (c in s.categories) {
+            val match = cats.firstOrNull {
+                (c.slug != null && it.slug == c.slug) || it.name.equals(c.name, ignoreCase = true)
+            }
+            if (match != null) {
+                idMap[c.id] = match.id
+            } else {
+                val newId = categoryDao.insert(c.copy(id = 0, slug = null))
+                idMap[c.id] = newId
+                cats.add(c.copy(id = newId, slug = null))
+            }
+        }
+        val validIds = cats.map { it.id }.toSet()
+        val otherId = cats.firstOrNull { it.slug == "other" }?.id ?: cats.firstOrNull()?.id ?: 0L
+
+        fun sig(a: Account) =
+            listOf(a.title.trim().lowercase(), a.username, a.email, a.password).joinToString("\u0000")
+        val seen = accountDao.getAll()
+            .mapNotNull { runCatching { toAccount(it, key) }.getOrNull() }
+            .map { sig(it) }.toHashSet()
+        var added = 0
+        var skipped = 0
+        for (a in s.accounts) {
+            if (!seen.add(sig(a))) { skipped++; continue }
+            val cid = idMap[a.categoryId] ?: if (a.categoryId in validIds) a.categoryId else otherId
+            accountDao.insert(
+                AccountEntity(
+                    categoryId = cid, isFavorite = a.isFavorite,
+                    createdAt = if (a.createdAt > 0) a.createdAt else now,
+                    lastUsedAt = a.lastUsedAt,
+                    expiryAt = if (a.expiryAt > 0) a.expiryAt else now + DEFAULT_EXPIRY_MS,
+                    payload = encode(a, key)
+                )
+            )
+            added++
+        }
+
+        fun nsig(n: SecureNote) = n.title.trim() + "\u0000" + n.body
+        val seenNotes = noteDao.getAll()
+            .mapNotNull { runCatching { toNote(it, key) }.getOrNull() }
+            .map { nsig(it) }.toHashSet()
+        var notesAdded = 0
+        for (n in s.notes) {
+            if (!seenNotes.add(nsig(n))) continue
+            noteDao.insert(
+                NoteEntity(
+                    createdAt = if (n.createdAt > 0) n.createdAt else now,
+                    updatedAt = if (n.updatedAt > 0) n.updatedAt else now,
+                    payload = Crypto.encryptString(
+                        key, JSONObject().put("title", n.title).put("body", n.body).toString()
+                    )
+                )
+            )
+            notesAdded++
+        }
+        return ImportResult(added, skipped, notesAdded)
+    }
+
     // ---------------- Encrypt / decrypt ----------------
 
     private fun encode(a: Account, key: ByteArray): ByteArray = Crypto.encryptString(

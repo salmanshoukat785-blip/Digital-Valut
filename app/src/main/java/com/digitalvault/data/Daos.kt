@@ -15,6 +15,9 @@ interface CategoryDao {
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun count(): Int
 
+    @Query("SELECT * FROM categories ORDER BY sortOrder, id")
+    suspend fun getAll(): List<CategoryEntity>
+
     @Query("SELECT * FROM categories WHERE slug = :slug LIMIT 1")
     suspend fun bySlug(slug: String): CategoryEntity?
 
@@ -69,6 +72,9 @@ interface NoteDao {
 
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun get(id: Long): NoteEntity?
+
+    @Query("SELECT * FROM notes")
+    suspend fun getAll(): List<NoteEntity>
 
     @Insert suspend fun insert(n: NoteEntity): Long
     @Update suspend fun update(n: NoteEntity)
