@@ -109,7 +109,7 @@ fun AccountDetailScreen(
         }
         StrengthBar(PasswordStrength.evaluate(account.password))
         if (account.url.isNotBlank()) DetailField(S.fUrl, account.url)
-        DetailField(S.fCategory, category?.name ?: "-")
+        DetailField(S.fCategory, category?.let { categoryLabel(it) } ?: "-")
         DetailField(S.dateAdded, formatDate(account.createdAt))
         DetailField(S.expires, formatDate(account.expiryAt))
         if (account.notes.isNotBlank()) DetailField(S.fNotes, account.notes)

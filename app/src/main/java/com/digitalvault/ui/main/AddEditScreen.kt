@@ -172,7 +172,7 @@ fun AddEditScreen(
 
         Box(Modifier.fillMaxWidth()) {
             OutlinedTextField(
-                value = selectedCategory?.name ?: "", onValueChange = {}, readOnly = true,
+                value = selectedCategory?.let { categoryLabel(it) } ?: "", onValueChange = {}, readOnly = true,
                 label = { Text(S.fCategory) }, modifier = Modifier.fillMaxWidth(),
                 trailingIcon = { Icon(Icons.Filled.ArrowDropDown, contentDescription = null) }
             )
@@ -180,7 +180,7 @@ fun AddEditScreen(
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                 categories.forEach { c ->
                     DropdownMenuItem(
-                        text = { Text(c.name) },
+                        text = { Text(categoryLabel(c)) },
                         onClick = { categoryId = c.id; menuOpen = false },
                         leadingIcon = {
                             Icon(categoryIcon(c.icon), contentDescription = null, tint = categoryColor(c))

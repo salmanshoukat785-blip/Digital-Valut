@@ -31,21 +31,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
 import com.digitalvault.DigitalVaultApp
 import com.digitalvault.data.VaultRepository
+import com.digitalvault.ui.AuthViewModel
 import com.digitalvault.ui.S
 import kotlinx.coroutines.launch
 
-private enum class Tab(val label: String, val icon: ImageVector) {
-    Home(S.home, Icons.Filled.Home),
-    Passwords(S.passwordsTab, Icons.Filled.VpnKey),
-    Generator(S.generatorTab, Icons.Filled.Autorenew),
-    Notes(S.notesTab, Icons.Filled.Description),
-    Settings(S.settingsTab, Icons.Filled.Settings)
+private enum class Tab(val label: () -> String, val icon: ImageVector) {
+    Home({ S.home }, Icons.Filled.Home),
+    Passwords({ S.passwordsTab }, Icons.Filled.VpnKey),
+    Generator({ S.generatorTab }, Icons.Filled.Autorenew),
+    Notes({ S.notesTab }, Icons.Filled.Description),
+    Settings({ S.settingsTab }, Icons.Filled.Settings)
 }
 
 @Composable
-fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
+fun MainScreen(repo: VaultRepository, vm: AuthViewModel, activity: FragmentActivity) {
     val scope = rememberCoroutineScope()
     val settings = (LocalContext.current.applicationContext as DigitalVaultApp).settings
 
@@ -64,7 +66,7 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
     var editId by rememberSaveable { mutableLongStateOf(0L) }
     var noteEditing by rememberSaveable { mutableStateOf(false) }
     var noteId by rememberSaveable { mutableLongStateOf(0L) }
-    // Generator se aaya password: jaan-boojh kar saveable nahi (state bundle mein password nahi jana chahiye)
+    // Generator se aaya password: jaan-boojh kar saveable nahi
     var prefill by remember { mutableStateOf("") }
 
     val detail = accounts.firstOrNull { it.id == detailId }
@@ -125,8 +127,8 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
                             NavigationBarItem(
                                 selected = tabIndex == i,
                                 onClick = { tabIndex = i },
-                                icon = { Icon(t.icon, contentDescription = t.label) },
-                                label = { Text(t.label, fontSize = 11.sp, maxLines = 1) }
+                                icon = { Icon(t.icon, contentDescription = t.label()) },
+                                label = { Text(t.label(), fontSize = 11.sp, maxLines = 1) }
                             )
                         }
                     }
@@ -148,7 +150,7 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
                         0 -> DashboardScreen(
                             accounts = accounts,
                             categories = categories,
-                            onLock = onLock,
+                            onLock = { vm.lockNow() },
                             onOpenCategory = { filter = it; tabIndex = 1 },
                             onOpenAccount = { detailId = it },
                             onAdd = { editId = 0L; editing = true },
@@ -169,7 +171,7 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
 
                         3 -> NotesScreen(notes = notes, onOpen = { noteId = it; noteEditing = true })
 
-                        else -> SettingsScreen(settings = settings, onLock = onLock)
+                        else -> SettingsScreen(vm = vm, repo = repo, settings = settings, activity = activity)
                     }
                 }
             }

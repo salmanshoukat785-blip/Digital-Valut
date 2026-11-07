@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.digitalvault.data.Account
 import com.digitalvault.data.CategoryEntity
 import com.digitalvault.data.PasswordHealth
+import com.digitalvault.ui.S
 import java.text.DateFormat
 import java.util.Date
 
@@ -64,10 +65,10 @@ fun categoryColor(c: CategoryEntity?): Color = if (c == null) Color(0xFF757575) 
 fun formatDate(ms: Long): String = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(ms))
 
 fun statusOf(a: Account, h: PasswordHealth): Pair<String, Color>? = when {
-    a.id in h.expired -> "Expired" to Red
-    a.id in h.expiringSoon -> "Change soon" to Amber
-    a.id in h.weak -> "Weak" to Red
-    a.id in h.reused -> "Reused" to Amber
+    a.id in h.expired -> S.expired to Red
+    a.id in h.expiringSoon -> S.changeSoon to Amber
+    a.id in h.weak -> S.weak to Red
+    a.id in h.reused -> S.reused to Amber
     else -> null
 }
 
@@ -124,4 +125,19 @@ fun AccountRow(
             }
         }
     }
+}
+
+private val defaultEn = mapOf(
+    "social" to "Social Media", "email" to "Email", "banking" to "Banking", "websites" to "Websites",
+    "work" to "Work", "personal" to "Personal", "wifi" to "Wi-Fi", "other" to "Other"
+)
+private val defaultUr = mapOf(
+    "social" to "سوشل میڈیا", "email" to "ای میل", "banking" to "بینکنگ", "websites" to "ویب سائٹس",
+    "work" to "کام", "personal" to "ذاتی", "wifi" to "وائی فائی", "other" to "دیگر"
+)
+
+/** Default category ka naam Urdu mein dikhata hai (agar user ne rename nahi kiya), baqi jaisa hai. */
+fun categoryLabel(c: CategoryEntity): String {
+    val slug = c.slug
+    return if (slug != null && c.name == defaultEn[slug] && S.lang == 1) defaultUr[slug] ?: c.name else c.name
 }

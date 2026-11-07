@@ -78,10 +78,10 @@ fun DashboardScreen(
             StatCard(S.needAttention, attention.toString(), if (attention > 0) Amber else MaterialTheme.colorScheme.onSurface)
         }
         val parts = buildList {
-            if (health.weak.isNotEmpty()) add("${health.weak.size} weak")
-            if (health.reused.isNotEmpty()) add("${health.reused.size} reused")
-            if (health.expired.isNotEmpty()) add("${health.expired.size} expired")
-            if (health.expiringSoon.isNotEmpty()) add("${health.expiringSoon.size} expiring soon")
+            if (health.weak.isNotEmpty()) add("${health.weak.size} ${S.weak}")
+            if (health.reused.isNotEmpty()) add("${health.reused.size} ${S.reused}")
+            if (health.expired.isNotEmpty()) add("${health.expired.size} ${S.expired}")
+            if (health.expiringSoon.isNotEmpty()) add("${health.expiringSoon.size} ${S.changeSoon}")
         }
         if (parts.isNotEmpty()) {
             Text(parts.joinToString(" · "), color = Amber, fontSize = 12.sp)
@@ -173,7 +173,7 @@ private fun RowScope.CategoryCard(c: CategoryEntity, count: Int, onClick: () -> 
         }
         Spacer(Modifier.width(10.dp))
         Column {
-            Text(c.name, fontSize = 13.sp, maxLines = 1)
+            Text(categoryLabel(c), fontSize = 13.sp, maxLines = 1)
             Text(count.toString(), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
         }
     }

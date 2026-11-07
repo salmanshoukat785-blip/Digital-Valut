@@ -98,7 +98,7 @@ fun PasswordsScreen(
             items(categories, key = { it.id }) { c ->
                 FilterChip(
                     selected = filter == c.id, onClick = { onFilter(c.id) },
-                    label = { Text("${c.name} ${counts[c.id] ?: 0}") },
+                    label = { Text("${categoryLabel(c)} ${counts[c.id] ?: 0}") },
                     leadingIcon = {
                         Icon(categoryIcon(c.icon), contentDescription = null, modifier = Modifier.size(16.dp), tint = categoryColor(c))
                     }
