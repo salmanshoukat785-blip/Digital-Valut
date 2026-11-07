@@ -6,6 +6,7 @@ import com.digitalvault.data.VaultRepository
 import com.digitalvault.reminder.ExpiryScheduler
 import com.digitalvault.security.KeyVault
 import com.digitalvault.settings.AppSettings
+import com.digitalvault.ui.S
 
 class DigitalVaultApp : Application() {
     lateinit var vault: KeyVault
@@ -20,6 +21,7 @@ class DigitalVaultApp : Application() {
         vault = KeyVault(this)
         repository = VaultRepository(vault, VaultDatabase.get(this))
         settings = AppSettings(this)
+        S.lang = settings.language
         ExpiryScheduler.schedule(this)
     }
 }
