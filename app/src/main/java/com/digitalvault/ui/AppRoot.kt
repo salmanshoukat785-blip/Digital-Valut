@@ -16,7 +16,7 @@ fun AppRoot(vm: AuthViewModel, activity: FragmentActivity) {
         AuthViewModel.Stage.FingerprintOffer -> FingerprintOfferScreen(vm, activity)
         AuthViewModel.Stage.Unlocked -> {
             val repo = remember { (activity.application as DigitalVaultApp).repository }
-            MainScreen(repo = repo, onLock = { vm.lockNow() })
+            MainScreen(repo = repo, vm = vm, activity = activity)
         }
     }
 }

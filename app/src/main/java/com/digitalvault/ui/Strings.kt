@@ -1,135 +1,201 @@
 package com.digitalvault.ui
 
-/** Tamam UI text ek jagah. Part 7 mein Urdu/English language selection isi par lagega. */
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
+
+/** Tamam UI text. lang: 0 = English, 1 = Urdu. Badalne par screen khud dobara bante hain. */
 object S {
-    const val appName = "Digital Vault"
-    const val tagline = "Your private, offline password vault"
+    var lang by mutableIntStateOf(0)
 
-    const val masterTitle = "Create your Master Password"
-    const val masterHint = "At least 10 characters, using 3 of these: capital letters, small letters, numbers, symbols. It protects all your data."
-    const val masterLabel = "Master Password"
-    const val confirmLabel = "Confirm password"
-    const val mismatch = "Passwords don't match."
-    const val weakMaster = "That Master Password is too weak."
-    const val next = "Next"
-    const val back = "Back"
+    private fun t(en: String, ur: String): String = if (lang == 1) ur else en
 
-    const val pinTitle = "Set a PIN"
-    const val pinHint = "4 to 6 digits for quick unlock. Your data is protected by the Master Password, not by the PIN alone."
-    const val pinLabel = "PIN"
-    const val pinConfirm = "Confirm PIN"
+    val appName: String get() = t("Digital Vault", "ڈیجیٹل والٹ")
+    val tagline: String get() = t("Your private, offline password vault", "آپ کا نجی، آف لائن پاسورڈ والٹ")
 
-    const val recoveryTitle = "Your Recovery Key"
-    const val recoveryHint = "Write this key on paper and keep it safe. If you forget your Master Password, it's the only way to get your data back. It won't be shown again."
-    const val recoveryConfirm = "I've written down my Recovery Key"
-    const val createVault = "Create vault"
-    const val setupFailed = "Couldn't create the vault. Try again."
+    val masterTitle: String get() = t("Create your Master Password", "اپنا ماسٹر پاسورڈ بنائیں")
+    val masterHint: String get() = t("At least 10 characters, using 3 of these: capital letters, small letters, numbers, symbols. It protects all your data.", "کم از کم 10 حروف، اور ان میں سے 3 اقسام: بڑے حروف، چھوٹے حروف، نمبر، علامات۔ یہ آپ کے تمام ڈیٹا کی حفاظت کرتا ہے۔")
+    val masterLabel: String get() = t("Master Password", "ماسٹر پاسورڈ")
+    val confirmLabel: String get() = t("Confirm password", "پاسورڈ کی تصدیق")
+    val mismatch: String get() = t("Passwords don't match.", "پاسورڈ آپس میں نہیں ملتے۔")
+    val weakMaster: String get() = t("That Master Password is too weak.", "یہ ماسٹر پاسورڈ بہت کمزور ہے۔")
+    val next: String get() = t("Next", "آگے")
+    val back: String get() = t("Back", "واپس")
 
-    const val enterPin = "Enter your PIN"
-    const val enterMaster = "Enter your Master Password"
-    const val unlock = "Unlock"
-    const val useMaster = "Use Master Password"
-    const val usePin = "Use PIN"
-    const val forgotPin = "Forgot PIN?"
-    const val forgotMaster = "Forgot Master Password?"
-    const val fingerprint = "Fingerprint"
-    const val delete = "Delete"
+    val pinTitle: String get() = t("Set a PIN", "PIN سیٹ کریں")
+    val pinHint: String get() = t("4 to 6 digits for quick unlock. Your data is protected by the Master Password, not by the PIN alone.", "فوری کھولنے کے لیے 4 سے 6 ہندسے۔ آپ کا ڈیٹا صرف PIN سے نہیں بلکہ ماسٹر پاسورڈ سے محفوظ ہے۔")
+    val pinLabel: String get() = t("PIN", "PIN")
+    val pinConfirm: String get() = t("Confirm PIN", "PIN کی تصدیق")
 
-    const val recoveryEnterTitle = "Reset with Recovery Key"
-    const val recoveryCodeLabel = "Recovery Key"
-    const val newMasterLabel = "New Master Password"
-    const val resetUnlock = "Reset and unlock"
+    val recoveryTitle: String get() = t("Your Recovery Key", "آپ کی ریکوری کی")
+    val recoveryHint: String get() = t("Write this key on paper and keep it safe. If you forget your Master Password, it's the only way to get your data back. It won't be shown again.", "یہ کی کاغذ پر لکھ کر محفوظ رکھیں۔ ماسٹر پاسورڈ بھول جائیں تو ڈیٹا واپس لینے کا یہی واحد طریقہ ہے۔ یہ دوبارہ نہیں دکھائی جائے گی۔")
+    val recoveryConfirm: String get() = t("I've written down my Recovery Key", "میں نے ریکوری کی لکھ لی ہے")
+    val createVault: String get() = t("Create vault", "والٹ بنائیں")
+    val setupFailed: String get() = t("Couldn't create the vault. Try again.", "والٹ نہیں بن سکا۔ دوبارہ کوشش کریں۔")
 
-    const val newPinTitle = "Set a new PIN"
-    const val savePin = "Save PIN"
+    val enterPin: String get() = t("Enter your PIN", "اپنا PIN درج کریں")
+    val enterMaster: String get() = t("Enter your Master Password", "اپنا ماسٹر پاسورڈ درج کریں")
+    val unlock: String get() = t("Unlock", "کھولیں")
+    val useMaster: String get() = t("Use Master Password", "ماسٹر پاسورڈ استعمال کریں")
+    val usePin: String get() = t("Use PIN", "PIN استعمال کریں")
+    val forgotPin: String get() = t("Forgot PIN?", "PIN بھول گئے؟")
+    val forgotMaster: String get() = t("Forgot Master Password?", "ماسٹر پاسورڈ بھول گئے؟")
+    val fingerprint: String get() = t("Fingerprint", "فنگر پرنٹ")
+    val delete: String get() = t("Delete", "حذف کریں")
 
-    const val fingerprintOfferTitle = "Unlock with fingerprint?"
-    const val fingerprintOfferBody = "You can open the vault with your fingerprint. You can change this later in Settings."
-    const val enable = "Enable"
-    const val notNow = "Not now"
-    const val cancel = "Cancel"
-    const val fingerprintUnlockTitle = "Unlock Digital Vault"
-    const val fingerprintEnrollTitle = "Enable fingerprint"
+    val recoveryEnterTitle: String get() = t("Reset with Recovery Key", "ریکوری کی سے ری سیٹ کریں")
+    val recoveryCodeLabel: String get() = t("Recovery Key", "ریکوری کی")
+    val newMasterLabel: String get() = t("New Master Password", "نیا ماسٹر پاسورڈ")
+    val resetUnlock: String get() = t("Reset and unlock", "ری سیٹ کر کے کھولیں")
 
-    const val unlocked = "Vault unlocked"
-    const val unlockedBody = "The real screens arrive in Part 4."
-    const val lockNow = "Lock now"
+    val newPinTitle: String get() = t("Set a new PIN", "نیا PIN سیٹ کریں")
+    val savePin: String get() = t("Save PIN", "PIN محفوظ کریں")
 
-    fun wrong(left: Int) = "Wrong details. $left attempt(s) left before a temporary lock."
-    fun locked(time: String) = "Too many wrong attempts. Try again in $time."
-    const val failedRecovery = "That Recovery Key didn't work."
+    val fingerprintOfferTitle: String get() = t("Unlock with fingerprint?", "فنگر پرنٹ سے کھولیں؟")
+    val fingerprintOfferBody: String get() = t("You can open the vault with your fingerprint. You can change this later in Settings.", "آپ والٹ فنگر پرنٹ سے کھول سکتے ہیں۔ یہ بعد میں سیٹنگز میں بدلا جا سکتا ہے۔")
+    val enable: String get() = t("Enable", "آن کریں")
+    val notNow: String get() = t("Not now", "ابھی نہیں")
+    val cancel: String get() = t("Cancel", "منسوخ")
+    val fingerprintUnlockTitle: String get() = t("Unlock Digital Vault", "ڈیجیٹل والٹ کھولیں")
+    val fingerprintEnrollTitle: String get() = t("Enable fingerprint", "فنگر پرنٹ آن کریں")
 
-    // ---- Part 4 ----
-    const val copyRecovery = "Copy Recovery Key"
-    const val recoveryCopied = "Copied. The clipboard clears itself in 30 seconds, so paste it somewhere safe right away. Don't keep it in a cloud-synced note."
+    val lockNow: String get() = t("Lock now", "ابھی لاک کریں")
 
-    const val home = "Home"
-    const val passwordsTab = "Passwords"
-    const val generatorTab = "Generator"
-    const val notesTab = "Notes"
-    const val settingsTab = "Settings"
-    const val welcome = "Welcome back"
-    const val totalPasswords = "Total passwords"
-    const val needAttention = "Need attention"
-    const val quickAdd = "Add"
-    const val categories = "Categories"
-    const val recentlyAdded = "Recently added"
-    const val recentlyUsed = "Recently used"
-    const val searchHint = "Search passwords"
-    const val all = "All"
-    const val favorites = "Favorites"
-    const val noPasswords = "No passwords yet. Tap + to add your first one."
-    const val noResults = "Nothing found."
-    const val addTitle = "Add new password"
-    const val editTitle = "Edit password"
-    const val fTitle = "Website or app name"
-    const val fUsername = "Username"
-    const val fEmail = "Email address"
-    const val fPassword = "Password"
-    const val fUrl = "Website URL"
-    const val fNotes = "Notes"
-    const val fCategory = "Category"
-    const val fExpiry = "Change password reminder"
-    const val expiryDefault = "In 90 days (default)"
-    const val expiryChange = "Choose date"
-    const val expiryReset = "Use default"
-    const val unchanged = "(unchanged)"
-    const val dateAdded = "Date added"
-    const val expires = "Change password by"
-    const val save = "Save"
-    const val edit = "Edit"
-    const val generate = "Generate"
-    const val copy = "Copy"
-    const val copied = "Copied. Clears in 30 seconds."
-    const val show = "Show"
-    const val hide = "Hide"
-    const val confirmDeleteTitle = "Delete this password?"
-    const val confirmDeleteBody = "This can't be undone."
-    const val close = "Close"
-    fun comingSoon(part: Int) = "Coming in Part $part"
+    fun wrong(left: Int): String = t("Wrong details. $left attempt(s) left before a temporary lock.", "غلط معلومات۔ عارضی لاک سے پہلے $left کوشش(یں) باقی ہیں۔")
+    fun locked(time: String): String = t("Too many wrong attempts. Try again in $time.", "بہت زیادہ غلط کوششیں۔ $time بعد دوبارہ کوشش کریں۔")
+    val failedRecovery: String get() = t("That Recovery Key didn't work.", "یہ ریکوری کی کام نہیں کی۔")
 
-    // ---- Part 5 ----
-    const val genTitle = "Password generator"
-    const val genLength = "Length"
-    const val genUpper = "Capital letters (A-Z)"
-    const val genLower = "Small letters (a-z)"
-    const val genDigits = "Numbers (0-9)"
-    const val genSymbols = "Special characters (!@#...)"
-    const val regenerate = "Generate new"
-    const val useForAccount = "Save as new password"
+    val copyRecovery: String get() = t("Copy Recovery Key", "ریکوری کی کاپی کریں")
+    val recoveryCopied: String get() = t("Copied. The clipboard clears itself in 30 seconds, so paste it somewhere safe right away. Don't keep it in a cloud-synced note.", "کاپی ہو گئی۔ کلپ بورڈ 30 سیکنڈ میں خود صاف ہو جاتا ہے، اس لیے اسے فوراً کسی محفوظ جگہ پیسٹ کریں۔ اسے کلاؤڈ سے سنک ہونے والے نوٹ میں نہ رکھیں۔")
 
-    const val notesTitle = "Secure Notes"
-    const val noteTitleLabel = "Title"
-    const val noteBodyLabel = "Secret note"
-    const val untitled = "Untitled note"
-    const val noNotes = "No secure notes yet. Tap + to add one."
-    const val addNote = "New note"
-    const val editNote = "Edit note"
-    const val confirmDeleteNoteTitle = "Delete this note?"
+    val home: String get() = t("Home", "ہوم")
+    val passwordsTab: String get() = t("Passwords", "پاسورڈز")
+    val generatorTab: String get() = t("Generator", "جنریٹر")
+    val notesTab: String get() = t("Notes", "نوٹس")
+    val settingsTab: String get() = t("Settings", "سیٹنگز")
+    val welcome: String get() = t("Welcome back", "خوش آمدید")
+    val totalPasswords: String get() = t("Total passwords", "کل پاسورڈز")
+    val needAttention: String get() = t("Need attention", "توجہ طلب")
+    val quickAdd: String get() = t("Add", "شامل کریں")
+    val categories: String get() = t("Categories", "کیٹیگریز")
+    val recentlyAdded: String get() = t("Recently added", "حال ہی میں شامل")
+    val recentlyUsed: String get() = t("Recently used", "حال ہی میں استعمال شدہ")
+    val searchHint: String get() = t("Search passwords", "پاسورڈ تلاش کریں")
+    val all: String get() = t("All", "سب")
+    val favorites: String get() = t("Favorites", "پسندیدہ")
+    val noPasswords: String get() = t("No passwords yet. Tap + to add your first one.", "ابھی کوئی پاسورڈ نہیں۔ پہلا شامل کرنے کے لیے + دبائیں۔")
+    val noResults: String get() = t("Nothing found.", "کچھ نہیں ملا۔")
+    val addTitle: String get() = t("Add new password", "نیا پاسورڈ شامل کریں")
+    val editTitle: String get() = t("Edit password", "پاسورڈ میں ترمیم")
+    val fTitle: String get() = t("Website or app name", "ویب سائٹ یا ایپ کا نام")
+    val fUsername: String get() = t("Username", "یوزرنیم")
+    val fEmail: String get() = t("Email address", "ای میل ایڈریس")
+    val fPassword: String get() = t("Password", "پاسورڈ")
+    val fUrl: String get() = t("Website URL", "ویب سائٹ URL")
+    val fNotes: String get() = t("Notes", "نوٹس")
+    val fCategory: String get() = t("Category", "کیٹیگری")
+    val fExpiry: String get() = t("Change password reminder", "پاسورڈ بدلنے کی یاددہانی")
+    val expiryDefault: String get() = t("In 90 days (default)", "90 دن میں (ڈیفالٹ)")
+    val expiryChange: String get() = t("Choose date", "تاریخ چنیں")
+    val expiryReset: String get() = t("Use default", "ڈیفالٹ استعمال کریں")
+    val unchanged: String get() = t("(unchanged)", "(بغیر تبدیلی)")
+    val dateAdded: String get() = t("Date added", "شامل کرنے کی تاریخ")
+    val expires: String get() = t("Change password by", "پاسورڈ بدلنے کی آخری تاریخ")
+    val save: String get() = t("Save", "محفوظ کریں")
+    val edit: String get() = t("Edit", "ترمیم")
+    val generate: String get() = t("Generate", "بنائیں")
+    val copy: String get() = t("Copy", "کاپی")
+    val copied: String get() = t("Copied. Clears in 30 seconds.", "کاپی ہو گیا۔ 30 سیکنڈ میں صاف ہو جائے گا۔")
+    val show: String get() = t("Show", "دکھائیں")
+    val hide: String get() = t("Hide", "چھپائیں")
+    val confirmDeleteTitle: String get() = t("Delete this password?", "یہ پاسورڈ حذف کریں؟")
+    val confirmDeleteBody: String get() = t("This can't be undone.", "یہ عمل واپس نہیں ہو سکتا۔")
+    val close: String get() = t("Close", "بند کریں")
 
-    const val appearance = "Appearance"
-    const val themeDark = "Dark"
-    const val themeLight = "Light"
-    const val themeSystem = "System"
-    const val moreSettings = "PIN, backup, auto-lock and language settings arrive in Part 7."
+    val genTitle: String get() = t("Password generator", "پاسورڈ جنریٹر")
+    val genLength: String get() = t("Length", "لمبائی")
+    val genUpper: String get() = t("Capital letters (A-Z)", "بڑے حروف (A-Z)")
+    val genLower: String get() = t("Small letters (a-z)", "چھوٹے حروف (a-z)")
+    val genDigits: String get() = t("Numbers (0-9)", "نمبر (0-9)")
+    val genSymbols: String get() = t("Special characters (!@#...)", "خاص علامات (!@#...)")
+    val regenerate: String get() = t("Generate new", "نیا بنائیں")
+    val useForAccount: String get() = t("Save as new password", "نئے پاسورڈ کے طور پر محفوظ کریں")
+
+    val notesTitle: String get() = t("Secure Notes", "محفوظ نوٹس")
+    val noteTitleLabel: String get() = t("Title", "عنوان")
+    val noteBodyLabel: String get() = t("Secret note", "خفیہ نوٹ")
+    val untitled: String get() = t("Untitled note", "بغیر عنوان نوٹ")
+    val noNotes: String get() = t("No secure notes yet. Tap + to add one.", "ابھی کوئی محفوظ نوٹ نہیں۔ شامل کرنے کے لیے + دبائیں۔")
+    val addNote: String get() = t("New note", "نیا نوٹ")
+    val editNote: String get() = t("Edit note", "نوٹ میں ترمیم")
+    val confirmDeleteNoteTitle: String get() = t("Delete this note?", "یہ نوٹ حذف کریں؟")
+
+    val appearance: String get() = t("Appearance", "ظاہری شکل")
+    val themeDark: String get() = t("Dark", "ڈارک")
+    val themeLight: String get() = t("Light", "لائٹ")
+    val themeSystem: String get() = t("System", "سسٹم")
+
+    // ---- Strength / status ----
+    val weak: String get() = t("Weak", "کمزور")
+    val medium: String get() = t("Medium", "درمیانہ")
+    val strong: String get() = t("Strong", "مضبوط")
+    val reused: String get() = t("Reused", "دہرایا گیا")
+    val expired: String get() = t("Expired", "میعاد ختم")
+    val changeSoon: String get() = t("Change soon", "جلد بدلیں")
+
+    // ---- Settings ----
+    val language: String get() = t("Language", "زبان")
+    val langEnglish: String get() = "English"
+    val langUrdu: String get() = "اردو"
+    val security: String get() = t("Security", "سیکیورٹی")
+    val changePin: String get() = t("Change PIN", "PIN تبدیل کریں")
+    val changeMaster: String get() = t("Change Master Password", "ماسٹر پاسورڈ تبدیل کریں")
+    val currentMaster: String get() = t("Current Master Password", "موجودہ ماسٹر پاسورڈ")
+    val newPinLabel: String get() = t("New PIN", "نیا PIN")
+    val pinChanged: String get() = t("PIN changed.", "PIN تبدیل ہو گیا۔")
+    val masterChanged: String get() = t("Master Password changed.", "ماسٹر پاسورڈ تبدیل ہو گیا۔")
+    val fingerprintUnlock: String get() = t("Fingerprint unlock", "فنگر پرنٹ سے کھولنا")
+    val fingerprintUnavailable: String get() = t("Fingerprint isn't set up on this phone.", "اس فون میں فنگر پرنٹ سیٹ نہیں ہے۔")
+    val autoLock: String get() = t("Auto-lock", "آٹو لاک")
+    val autoLockTitle: String get() = t("Lock after leaving the app", "ایپ چھوڑنے کے بعد لاک")
+    val alImmediate: String get() = t("Immediately", "فوراً")
+    val al30: String get() = t("After 30 seconds", "30 سیکنڈ بعد")
+    val al1m: String get() = t("After 1 minute", "1 منٹ بعد")
+    val al5m: String get() = t("After 5 minutes", "5 منٹ بعد")
+    val blockScreens: String get() = t("Block screenshots and screen recording", "اسکرین شاٹ اور اسکرین ریکارڈنگ بلاک کریں")
+    val newRecoveryKey: String get() = t("Create a new Recovery Key", "نئی ریکوری کی بنائیں")
+    val newRecoveryWarn: String get() = t("Your old Recovery Key will stop working. Write the new one down.", "آپ کی پرانی ریکوری کی کام کرنا بند کر دے گی۔ نئی کی لکھ لیں۔")
+    val confirmWithMaster: String get() = t("Enter your Master Password to continue", "جاری رکھنے کے لیے ماسٹر پاسورڈ درج کریں")
+
+    val backupSection: String get() = t("Backup and restore", "بیک اپ اور ریسٹور")
+    val createBackup: String get() = t("Create encrypted backup", "انکرپٹڈ بیک اپ بنائیں")
+    val restoreBackup: String get() = t("Restore from backup", "بیک اپ سے بحال کریں")
+    val exportCsv: String get() = t("Export CSV", "CSV ایکسپورٹ کریں")
+    val importCsv: String get() = t("Import CSV", "CSV امپورٹ کریں")
+    val driveSoon: String get() = t("Google Drive backup: coming later.", "گوگل ڈرائیو بیک اپ: بعد میں آئے گا۔")
+    val backupPwTitle: String get() = t("Backup password", "بیک اپ پاسورڈ")
+    val backupPwHint: String get() = t("This password protects the backup file, and you'll need it to restore. It can be your Master Password or a different one (at least 8 characters).", "یہ پاسورڈ بیک اپ فائل کی حفاظت کرتا ہے اور بحال کرتے وقت درکار ہوگا۔ یہ ماسٹر پاسورڈ یا کوئی اور پاسورڈ ہو سکتا ہے (کم از کم 8 حروف)۔")
+    val backupPwLabel: String get() = t("Backup password", "بیک اپ پاسورڈ")
+    val backupDone: String get() = t("Backup saved.", "بیک اپ محفوظ ہو گیا۔")
+    val backupFailed: String get() = t("Couldn't create the backup.", "بیک اپ نہیں بن سکا۔")
+    val restorePwTitle: String get() = t("Enter the backup password", "بیک اپ پاسورڈ درج کریں")
+    val restoreWrong: String get() = t("Wrong password, or this isn't a Digital Vault backup.", "پاسورڈ غلط ہے، یا یہ ڈیجیٹل والٹ کا بیک اپ نہیں ہے۔")
+    val restore: String get() = t("Restore", "بحال کریں")
+    fun restoreDone(a: Int, s: Int, n: Int): String = t("Restored: $a passwords added, $s already existed, $n notes added.", "بحال ہو گیا: $a پاسورڈ شامل ہوئے، $s پہلے سے موجود تھے، $n نوٹ شامل ہوئے۔")
+    val csvWarnTitle: String get() = t("Export unencrypted CSV?", "بغیر انکرپشن CSV ایکسپورٹ کریں؟")
+    val csvWarnBody: String get() = t("A CSV file shows all your passwords as plain text. Anyone who gets the file can read them. Delete it as soon as you're done.", "CSV فائل میں آپ کے تمام پاسورڈ سادہ متن میں ہوتے ہیں۔ جس کے ہاتھ فائل لگے وہ انہیں پڑھ سکتا ہے۔ کام ختم ہوتے ہی اسے حذف کر دیں۔")
+    val csvExported: String get() = t("CSV saved. Delete it as soon as you're done.", "CSV محفوظ ہو گئی۔ کام ختم ہوتے ہی اسے حذف کر دیں۔")
+    fun csvImported(a: Int, s: Int): String = t("Imported $a passwords, skipped $s. Delete the CSV file now: it holds plain-text passwords.", "$a پاسورڈ امپورٹ ہوئے، $s چھوڑ دیے گئے۔ CSV فائل اب حذف کر دیں: اس میں سادہ متن پاسورڈ ہیں۔")
+    val csvBad: String get() = t("Couldn't read this CSV. It needs a password column and a name or URL column.", "یہ CSV نہیں پڑھی جا سکی۔ اس میں پاسورڈ کا کالم اور نام یا URL کا کالم ہونا ضروری ہے۔")
+    val export: String get() = t("Export", "ایکسپورٹ")
+    val create: String get() = t("Create", "بنائیں")
+    val continueLabel: String get() = t("Continue", "جاری رکھیں")
+    val change: String get() = t("Change", "تبدیل کریں")
+    val ok: String get() = t("OK", "ٹھیک ہے")
+    val done: String get() = t("Done", "مکمل")
+
+    val appInfo: String get() = t("App info", "ایپ کی معلومات")
+    val version: String get() = t("Version", "ورژن")
+    val infoOffline: String get() = t("Works fully offline. This app has no internet permission.", "مکمل آف لائن چلتی ہے۔ اس ایپ کے پاس انٹرنیٹ کی اجازت ہی نہیں ہے۔")
+    val infoEncryption: String get() = t("Encryption: AES-256-GCM, keys protected by Android Keystore.", "انکرپشن: AES-256-GCM، چابیاں Android Keystore سے محفوظ۔")
 }

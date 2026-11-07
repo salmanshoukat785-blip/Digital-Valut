@@ -13,7 +13,10 @@ import com.digitalvault.security.AttemptLimiter
 import com.digitalvault.security.Biometric
 import com.digitalvault.security.Crypto
 import com.digitalvault.security.RecoveryCode
+import android.os.SystemClock
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.crypto.Cipher
@@ -174,12 +177,83 @@ class AuthViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------------- Lock ----------------
 
-    /** Activity ke onStop par: background mein jate hi dobara lock. */
-    fun onAppBackgrounded() {
-        when (stage) {
-            Stage.Unlocked, Stage.NewPin, Stage.FingerprintOffer -> lockNow()
-            else -> Unit
+    private var backgroundedAt = 0L
+    private var suppressBackground = false
+    private var lockJob: Job? = null
+
+    /** Bahar ki screen (file picker) kholne se pehle bulayein, taake us waqt vault lock na ho. */
+    fun suppressLockOnce() { suppressBackground = true }
+
+    private fun isUnlockedStage() =
+        stage == Stage.Unlocked || stage == Stage.NewPin || stage == Stage.FingerprintOffer
+
+    /** Activity ke onStop par. timeoutMs = 0 ho to foran lock, warna itne waqt baad. */
+    fun onAppBackgrounded(timeoutMs: Long) {
+        if (!isUnlockedStage() || suppressBackground) return
+        if (timeoutMs <= 0) { lockNow(); return }
+        backgroundedAt = SystemClock.elapsedRealtime()
+        lockJob?.cancel()
+        lockJob = viewModelScope.launch {
+            delay(timeoutMs)
+            if (backgroundedAt > 0) lockNow()
         }
+    }
+
+    /** Activity ke onStart par: agar waqt guzar gaya ho to lock. */
+    fun onAppForegrounded(timeoutMs: Long) {
+        suppressBackground = false
+        lockJob?.cancel()
+        val since = backgroundedAt
+        backgroundedAt = 0
+        if (since > 0 && isUnlockedStage() && SystemClock.elapsedRealtime() - since >= timeoutMs) lockNow()
+    }
+
+    // ---------------- Settings ke hassas kaam ----------------
+
+    class OpResult(val error: String?, val value: String? = null)
+
+    private fun lockText(): String {
+        val s = ((lockUntil - System.currentTimeMillis() + 999) / 1000).coerceAtLeast(1)
+        return if (s >= 60) "${s / 60}m ${s % 60}s" else "${s}s"
+    }
+
+    /** Hassas kaam se pehle Master Password dobara. null = theek, warna error text. */
+    suspend fun reauth(password: String): String? {
+        if (isLocked()) return S.locked(lockText())
+        val ok = withContext(Dispatchers.Default) { vault.verifyMaster(password.toCharArray()) }
+        if (ok) {
+            limiter.recordSuccess()
+            refreshLock()
+            return null
+        }
+        limiter.recordFailure()
+        refreshLock()
+        return if (lockUntil > 0) S.locked(lockText()) else S.wrong(attemptsLeft)
+    }
+
+    suspend fun changePin(master: String, newPin: String): String? {
+        reauth(master)?.let { return it }
+        withContext(Dispatchers.Default) { vault.changePin(newPin.toCharArray()) }
+        return null
+    }
+
+    suspend fun changeMaster(old: String, new: String): String? {
+        if (!com.digitalvault.security.KeyVault.isMasterPasswordAcceptable(new.toCharArray())) return S.weakMaster
+        reauth(old)?.let { return it }
+        val ok = withContext(Dispatchers.Default) {
+            vault.changeMasterPassword(old.toCharArray(), new.toCharArray())
+        }
+        return if (ok) null else S.wrong(attemptsLeft)
+    }
+
+    suspend fun newRecoveryKey(master: String): OpResult {
+        reauth(master)?.let { return OpResult(it) }
+        return OpResult(null, withContext(Dispatchers.Default) { vault.regenerateRecoveryKey() })
+    }
+
+    fun disableBiometric() {
+        vault.disableBiometric()
+        biometricEnabled = false
     }
 
     fun lockNow() {

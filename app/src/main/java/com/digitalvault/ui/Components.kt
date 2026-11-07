@@ -39,6 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -121,7 +124,7 @@ fun StrengthBar(strength: Strength) {
         Strength.MEDIUM -> Color(0xFFF5B14C)
         Strength.STRONG -> Color(0xFF6FD08C)
     }
-    val label = when (strength) { Strength.WEAK -> "Weak"; Strength.MEDIUM -> "Medium"; Strength.STRONG -> "Strong" }
+    val label = when (strength) { Strength.WEAK -> S.weak; Strength.MEDIUM -> S.medium; Strength.STRONG -> S.strong }
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -168,6 +171,19 @@ private fun KeyButton(onClick: () -> Unit, plain: Boolean = false, content: @Com
 
 @Composable
 fun Keypad(
+    onDigit: (Char) -> Unit,
+    onBackspace: () -> Unit,
+    showFingerprint: Boolean,
+    onFingerprint: () -> Unit
+) {
+    // Phone keypad hamesha 1-2-3 left se right (Urdu RTL mein bhi)
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        KeypadInner(onDigit, onBackspace, showFingerprint, onFingerprint)
+    }
+}
+
+@Composable
+private fun KeypadInner(
     onDigit: (Char) -> Unit,
     onBackspace: () -> Unit,
     showFingerprint: Boolean,
