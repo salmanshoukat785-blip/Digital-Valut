@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
+import com.digitalvault.settings.AppSettings
 import com.digitalvault.ui.AppRoot
 import com.digitalvault.ui.AuthViewModel
 import com.digitalvault.ui.theme.VaultTheme
@@ -27,8 +29,14 @@ class MainActivity : FragmentActivity() {
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         )
+        val settings = (application as DigitalVaultApp).settings
         setContent {
-            VaultTheme {
+            val dark = when (settings.themeMode) {
+                AppSettings.THEME_LIGHT -> false
+                AppSettings.THEME_SYSTEM -> isSystemInDarkTheme()
+                else -> true
+            }
+            VaultTheme(dark = dark) {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Box(Modifier.safeDrawingPadding()) {
                         AppRoot(vm, this@MainActivity)
