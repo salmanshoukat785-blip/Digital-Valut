@@ -1,12 +1,8 @@
 package com.digitalvault.ui.main
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -15,10 +11,8 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VpnKey
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -33,11 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import com.digitalvault.DigitalVaultApp
 import com.digitalvault.data.VaultRepository
 import com.digitalvault.ui.S
 import kotlinx.coroutines.launch
@@ -53,28 +47,55 @@ private enum class Tab(val label: String, val icon: ImageVector) {
 @Composable
 fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
     val scope = rememberCoroutineScope()
+    val settings = (LocalContext.current.applicationContext as DigitalVaultApp).settings
+
     // Data sirf is screen ke andar collect hota hai: lock par screen hatti to decrypt shuda data bhi chala jata hai
     val accountsFlow = remember { repo.observeAccounts() }
     val categoriesFlow = remember { repo.observeCategories() }
+    val notesFlow = remember { repo.observeNotes() }
     val accounts by accountsFlow.collectAsState(initial = emptyList())
     val categories by categoriesFlow.collectAsState(initial = emptyList())
+    val notes by notesFlow.collectAsState(initial = emptyList())
 
     var tabIndex by rememberSaveable { mutableIntStateOf(0) }
     var filter by rememberSaveable { mutableLongStateOf(FILTER_ALL) }
     var detailId by rememberSaveable { mutableLongStateOf(0L) }
     var editing by rememberSaveable { mutableStateOf(false) }
     var editId by rememberSaveable { mutableLongStateOf(0L) }
+    var noteEditing by rememberSaveable { mutableStateOf(false) }
+    var noteId by rememberSaveable { mutableLongStateOf(0L) }
+    // Generator se aaya password: jaan-boojh kar saveable nahi (state bundle mein password nahi jana chahiye)
+    var prefill by remember { mutableStateOf("") }
 
     val detail = accounts.firstOrNull { it.id == detailId }
+    val currentNote = notes.firstOrNull { it.id == noteId }
 
     when {
         editing -> {
-            BackHandler { editing = false }
+            BackHandler { editing = false; prefill = "" }
             AddEditScreen(
                 initial = accounts.firstOrNull { it.id == editId },
                 categories = categories,
                 onSave = { acc, exp -> repo.saveAccount(acc, exp) },
-                onClose = { editing = false }
+                onClose = { editing = false; prefill = "" },
+                prefillPassword = prefill
+            )
+        }
+
+        noteEditing -> {
+            BackHandler { noteEditing = false }
+            NoteEditScreen(
+                initial = currentNote,
+                onSave = { n -> repo.saveNote(n) },
+                onDelete = if (currentNote != null) {
+                    {
+                        val id = currentNote.id
+                        noteEditing = false
+                        noteId = 0L
+                        scope.launch { repo.deleteNote(id) }
+                    }
+                } else null,
+                onClose = { noteEditing = false }
             )
         }
 
@@ -115,6 +136,10 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
                         FloatingActionButton(onClick = { editId = 0L; editing = true }) {
                             Icon(Icons.Filled.Add, contentDescription = S.quickAdd)
                         }
+                    } else if (tabIndex == 3) {
+                        FloatingActionButton(onClick = { noteId = 0L; noteEditing = true }) {
+                            Icon(Icons.Filled.Add, contentDescription = S.addNote)
+                        }
                     }
                 }
             ) { padding ->
@@ -140,29 +165,14 @@ fun MainScreen(repo: VaultRepository, onLock: () -> Unit) {
                             onToggleFav = { a -> scope.launch { repo.setFavorite(a.id, !a.isFavorite) } }
                         )
 
-                        2 -> ComingSoon(S.generatorTab, 5)
-                        3 -> ComingSoon(S.notesTab, 5)
-                        else -> ComingSoon(S.settingsTab, 7, onLock)
+                        2 -> GeneratorScreen(onUse = { pw -> prefill = pw; editId = 0L; editing = true })
+
+                        3 -> NotesScreen(notes = notes, onOpen = { noteId = it; noteEditing = true })
+
+                        else -> SettingsScreen(settings = settings, onLock = onLock)
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun ComingSoon(title: String, part: Int, onLock: (() -> Unit)? = null) {
-    Column(
-        Modifier.fillMaxSize().padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(title, style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(6.dp))
-        Text(S.comingSoon(part), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        if (onLock != null) {
-            Spacer(Modifier.height(20.dp))
-            Button(onClick = onLock) { Text(S.lockNow) }
         }
     }
 }

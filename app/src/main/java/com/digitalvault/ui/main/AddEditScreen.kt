@@ -65,7 +65,8 @@ fun AddEditScreen(
     initial: Account?,
     categories: List<CategoryEntity>,
     onSave: suspend (Account, Long?) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    prefillPassword: String = ""
 ) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -74,14 +75,14 @@ fun AddEditScreen(
     var title by remember(key) { mutableStateOf(initial?.title ?: "") }
     var username by remember(key) { mutableStateOf(initial?.username ?: "") }
     var email by remember(key) { mutableStateOf(initial?.email ?: "") }
-    var password by remember(key) { mutableStateOf(initial?.password ?: "") }
+    var password by remember(key) { mutableStateOf(initial?.password ?: prefillPassword) }
     var url by remember(key) { mutableStateOf(initial?.url ?: "") }
     var notes by remember(key) { mutableStateOf(initial?.notes ?: "") }
     var categoryId by remember(key) {
         mutableLongStateOf(initial?.categoryId ?: categories.firstOrNull()?.id ?: 0L)
     }
     var customExpiry by remember(key) { mutableStateOf<Long?>(null) }
-    var showPw by remember { mutableStateOf(false) }
+    var showPw by remember { mutableStateOf(prefillPassword.isNotEmpty()) }
     var menuOpen by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
 
